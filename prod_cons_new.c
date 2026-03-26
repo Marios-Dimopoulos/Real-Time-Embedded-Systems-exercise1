@@ -5,7 +5,9 @@
 #include <math.h>
 
 #define QUEUESIZE 10
-#define LOOP 20
+#define LOOP 1
+#define P 2
+#define C 1
 
 void *producer(void *q);
 void *consumer(void *q);
@@ -24,36 +26,56 @@ typedef struct{
     pthread_cond_t *notFull, *notEmpty;
 }queue;
 
+
+struct thread_data{
+    queue *fifo;
+    int thread_id;
+};
+
 queue *queueInit(void);
 void queueDelete(queue *q);
 void queueAdd(queue *q, struct workFunction in);
 void queueDel(queue *q, struct workFunction *out);
 
-int main(){
+int main(int argc, char *argv[]){
     queue *fifo;
     fifo = queueInit();
-    pthread_t pro, con;
+    pthread_t pro[P], con[C];
 
-    pthread_create(&pro, NULL, producer, fifo);
-    pthread_create(&con, NULL, consumer, fifo);
-    pthread_join(pro, NULL);
-    pthread_join(con, NULL);
-    queueDelete(fifo);
-
+    for (int i=0; i<P; i++) {
+        struct thread_data *td = malloc(sizeof(struct thread_data));
+        td->fifo = fifo;
+        td->thread_id = i;
+        pthread_create(&pro[i], NULL, producer, (void *)td);
+    }
+    for (int i=0; i<C; i++) {
+        struct thread_data *td = malloc(sizeof(struct thread_data));
+        td->fifo = fifo;
+        td->thread_id = i;
+        pthread_create(&con[i], NULL, consumer, (void *)td);
+    }
+    for (int i=0; i<P; i++) {
+        pthread_join(pro[i], NULL);
+    }
+    for (int i=0; i<C; i++) {
+        pthread_join(con[i], NULL);
+    }
+    queueDelete(fifo);  
     return 0;
 }
 
 void *producer(void *q){
     queue *fifo;
-    int i;
 
-    fifo = (queue *)q;
+    fifo = ((struct thread_data *)q)->fifo;
+    int my_id = ((struct thread_data *)q)->thread_id;
+    free(q); // Αποδέσμευση μνήμης που δέσμευσε το main για τα δεδομένα του thread
 
-    for (i=0; i<LOOP; i++){
+    for (int i=0; i<LOOP; i++){
         struct workFunction wf;
         wf.work = calculate_sine;
         double *angle = malloc(sizeof(double));
-        *angle = i*10.0;
+        *angle = i*my_id;
         wf.arg = angle;
         pthread_mutex_lock(fifo->mut);
         while(fifo->full){
@@ -72,10 +94,10 @@ void *consumer(void *q){
     queue *fifo;
     int i;
 
-    fifo = (queue *)q;
+    fifo = ((struct thread_data *)q)->fifo;
     struct workFunction wf;
 
-    for (i=0; i<LOOP; i++){
+    while (1) {
         pthread_mutex_lock(fifo->mut);
         while(fifo->empty){
             printf("consumer: queue EMPTY.\n");
@@ -87,6 +109,7 @@ void *consumer(void *q){
 
         wf.work(wf.arg); // Εκτέλεση της συνάρτησης εργασίας
     }
+    return NULL;
 }
 
 void *calculate_sine(void *arg) {
