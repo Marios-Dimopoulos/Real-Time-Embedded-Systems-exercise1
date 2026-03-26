@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
     for (int i=0; i<P; i++) {
         pthread_join(pro[i], NULL);
     }
-    
+
     for (int i=0; i<C; i++) {
         pthread_join(con[i], NULL);
     }
@@ -163,17 +163,17 @@ queue *queueInit(void){
     queue *q;
 
     q = (queue *)malloc(sizeof(queue));
-    if (q ==  NULL){
-        return NULL;
-    }
+    MALLOC_CHECK(q);
 
     q->empty = 1;
     q->full = 0;
     q->head = 0;
     q->tail = 0;
     q->mut = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+    MALLOC_CHECK(q->mut);
     pthread_mutex_init(q->mut, NULL);
     q->notFull = (pthread_cond_t *)malloc(sizeof(pthread_cond_t));
+    MALLOC_CHECK(q->notFull);
     pthread_cond_init(q->notFull, NULL);
     q->notEmpty = (pthread_cond_t *)malloc(sizeof(pthread_cond_t));
     pthread_cond_init(q->notEmpty, NULL);   
