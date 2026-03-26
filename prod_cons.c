@@ -13,7 +13,7 @@
     } while (0)
 
 #define QUEUESIZE 10
-#define LOOP 10
+#define LOOP 1
 #define P 2
 #define C 1
 
@@ -83,9 +83,10 @@ void *producer(void *thread_data){
     queue *fifo = ((struct thread_data *)thread_data)->fifo;
     int thread_id = ((struct thread_data *)thread_data)->thread_id;
     free(thread_data); // Αποδέσμευση μνήμης που δέσμευσε ο main για τα δεδομένα του thread
+    struct workFunction task;
+    task.work = calculate_sine;
+
     for (int i=0; i<LOOP; i++){
-        struct workFunction task;
-        task.work = calculate_sine;
         double *arg = malloc(sizeof(double));
         *arg = (double)(thread_id * LOOP + i); // Υπολογισμός του επιχειρήματος για την εργασία
         task.arg = arg;
