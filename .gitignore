@@ -1,1 +1,4 @@
 .vscode/
+exec
+diagrams.py
+wait_times.csv
