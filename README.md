@@ -11,7 +11,7 @@
 Για τη μεταγλώττιση απαιτείται ο `gcc` και η σύνδεση με τις βιβλιοθήκες `pthread` και `m` (math):
 
 ```bash
-gcc prod_cons.c -o task_system -lpthread -lm
+gcc prod_cons.c -o executable -lpthread -lm
 
 ```
 ##  Εκτέλεση κώδικα
@@ -19,7 +19,7 @@ gcc prod_cons.c -o task_system -lpthread -lm
 
 ```bash
 
-./task_system
+./executable
 
 ```
 
