@@ -10,7 +10,7 @@ except FileNotFoundError:
 
 plt.figure(figsize=(12, 6))
 
-#Διάγραμμα 2: Ιστόγραμμα Κατανομής
+#Iστόγραμμα Κατανομής
 plt.hist(df['Wait_Time_us'], bins=50, color='blue', edgecolor='black', alpha=0.7)
 plt.title('Κατανομή Χρόνων Αναμονής')
 plt.xlabel('Χρόνος Αναμονής (μs)')
