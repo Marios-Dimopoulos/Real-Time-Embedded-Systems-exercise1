@@ -1,4 +1,4 @@
 .vscode/
-exec
+executable
 wait_times.csv
 report.pdf
